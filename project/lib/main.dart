@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'train/main.dart';
 import 'Elements/index.dart';
 import 'lounge/main.dart';
+import 'wifi/main.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -50,7 +51,7 @@ class StartPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  bouton('Play', context, const Lounge()),
+                  bouton('Play', context, Wifi()),
                   bouton('Training', context, const Training())
                 ],
               ),
