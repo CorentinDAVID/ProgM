@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'dart:async';
+import '../main.dart';
 
 import 'package:flutter_p2p_plus/flutter_p2p_plus.dart';
 import 'package:flutter_p2p_plus/protos/protos.pb.dart';
@@ -167,8 +168,29 @@ class _MyAppState extends State<Wifi> with WidgetsBindingObserver {
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text('Plugin example app 2'),
-        ),
+          backgroundColor: const Color.fromARGB(255, 18, 77, 126),
+          automaticallyImplyLeading: false,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Image.asset(
+                  'images/ic_launcher.png',
+                  fit: BoxFit.contain,
+                  height: 32,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const StartPage()),
+                  );
+                },
+              ),
+              Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Text('Projet ProgM'))
+            ],
+          )),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
