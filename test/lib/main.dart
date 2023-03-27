@@ -15,10 +15,15 @@ class Wifi extends StatefulWidget {
 }
 
 class _MyAppState extends State<Wifi> with WidgetsBindingObserver {
+  //
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  //adresse des l'appareils connectés
   var _deviceAddress = "";
+  //si on est connecté
   var _isConnected = false;
+  //si on est l'hôte
   var _isHost = false;
+  //si le port est ouvert
   var _isOpen = false;
 
   P2pSocket? _socket;
