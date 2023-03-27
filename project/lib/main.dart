@@ -22,7 +22,8 @@ class StartPage extends StatelessWidget {
           automaticallyImplyLeading: false,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [logo,
+            children: [
+              logo,
               Container(
                   padding: const EdgeInsets.all(8.0),
                   child: const Text('Projet ProgM'))
@@ -39,7 +40,10 @@ class StartPage extends StatelessWidget {
               height: 50,
               margin: const EdgeInsets.all(10.0),
               alignment: Alignment.topLeft,
-              child: alertBox("Game Rules", "Hello, you are in a fun game where you can play against your friends with the same wifi, to win the game you will have to pass different challenges.\n\nYou can also practice solo.\n\nHave fun!", context),
+              child: alertBox(
+                  "Game Rules",
+                  "Hello, you are in a fun game where you can play against your friends with the same wifi, to win the game you will have to pass different challenges.\n\nYou can also practice solo.\n\nHave fun!",
+                  context),
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 150.0, top: 100.0),
@@ -63,9 +67,15 @@ class StartPage extends StatelessWidget {
   }
 }
 
+var logo =
+    Image.asset('images/ic_launcher.png', fit: BoxFit.contain, height: 32);
 
-var logo = Image.asset('images/ic_launcher.png', fit: BoxFit.contain, height: 32);
+const wallpaper = BoxDecoration(
+    image: DecorationImage(
+  image: AssetImage('images/fond.png'),
+  fit: BoxFit.cover,
+));
 
-const wallpaper = BoxDecoration(image: DecorationImage(image: AssetImage('images/fond.png'), fit: BoxFit.cover,));
-
-const background_text = Text('Play a game', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 70, fontFamily: 'Lobster'));
+const background_text = Text('Play a game',
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.white, fontSize: 70, fontFamily: 'Lobster'));
