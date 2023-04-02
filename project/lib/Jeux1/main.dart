@@ -1,9 +1,10 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   static const String _title = 'Flutter Code Sample';
 
@@ -17,138 +18,161 @@ class MyApp extends StatelessWidget {
 }
 
 class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({super.key});
+  const MyStatefulWidget({Key? key}) : super(key: key);
 
   @override
   State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
 }
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  bool _answerIsOk = false;
+  Map<String, String> _questionsAndAnswers = {
+    'Quelle est la capitale de la France?': 'Paris',
+    'Quelle est la couleur du cheval blanc d\'Henri IV?': 'Blanc',
+    'Quel est le fruit préféré de George Washington?': 'Cerise',
+  };
 
-  /*@override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        alignment: FractionalOffset.centerLeft,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.wind_power,
-                color:
-                    _lightIsOn ? Color.fromARGB(255, 7, 204, 40) : Colors.black,
-                size: 60,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  // Toggle light when tapped.
-                  _lightIsOn = !_lightIsOn;
-                });
-              },
-              child: Container(
-                color: Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(8),
-                // Change button text when light changes state.
-                child: Text(_lightIsOn ? 'Réponse correcte' : 'Réponse'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }*/
+  String _currentQuestion = '';
+  List<String> _currentAnswers = [];
+  String _correctAnswer = '';
+  bool _answerIsCorrect = false;
+  int _score = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pickRandomQuestion();
+  }
+
+  void _pickRandomQuestion() {
+    var rng = Random();
+    var keys = _questionsAndAnswers.keys.toList();
+    var randomKey = keys[rng.nextInt(keys.length)];
+    _currentQuestion = randomKey;
+    _correctAnswer = _questionsAndAnswers[randomKey]!;
+    _currentAnswers = _shuffleAnswers(_questionsAndAnswers.values.toList());
+  }
+
+  List<String> _shuffleAnswers(List<String> answers) {
+    var rng = Random();
+    for (var i = answers.length - 1; i > 0; i--) {
+      var j = rng.nextInt(i + 1);
+      var temp = answers[i];
+      answers[i] = answers[j];
+      answers[j] = temp;
+    }
+    return answers;
+  }
+
+  void _checkAnswer(String selectedAnswer) {
+    if (selectedAnswer == _correctAnswer) {
+      setState(() {
+        _answerIsCorrect = true;
+        _score++;
+      });
+    } else {
+      setState(() {
+        _answerIsCorrect = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Quiz'),
+        actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: Text(
+                'Score: $_score',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Container(
-        alignment: FractionalOffset.centerLeft,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        padding: EdgeInsets.all(16.0),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(
+              _currentQuestion,
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 16.0),
+            Column(
+              children: _currentAnswers.map((answer) {
+                return GestureDetector(
+                  onTap: () => _checkAnswer(answer),
+                  child: Container(
+                    color: answer == _correctAnswer
+                        ? (_answerIsCorrect ? Colors.green : Colors.white)
+                        : (_answerIsCorrect && answer != _correctAnswer
+                            ? Colors.red
+                            : Colors.white),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    margin: EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      answer,
+                      style: TextStyle(
+                        fontSize: _answerIsCorrect && answer == _correctAnswer
+                            ? 20.0
+                            : 16.0,
+                        color: answer == _correctAnswer
+                            ? (_answerIsCorrect ? Colors.white : Colors.black)
+                            : Colors.black,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 16.0),
             GestureDetector(
               onTap: () {
-                // Callback pour le premier bouton
                 setState(() {
-                  // Toggle light when tapped.
-                  _answerIsOk = !_answerIsOk;
+                  _pickRandomQuestion();
+                  _answerIsCorrect = false;
                 });
               },
               child: Container(
-                color: Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(8),
-                child: Icon(
-                  Icons.wind_power,
-                  color: _answerIsOk
-                      ? Color.fromARGB(255, 7, 204, 40)
-                      : Colors.black,
-                  size: 60,
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Text(
+                  'Next Question',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.blue,
+                  ),
                 ),
               ),
             ),
-
+            SizedBox(height: 16.0),
             GestureDetector(
               onTap: () {
-                // Callback pour le deuxième bouton
                 setState(() {
-                  // Toggle light when tapped.
-                  _answerIsOk = !_answerIsOk;
+                  _score = 0;
+                  _answerIsCorrect = false;
                 });
               },
               child: Container(
-                color: Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(8),
-                child: Icon(
-                  Icons.wind_power,
-                  color: _answerIsOk
-                      ? Color.fromARGB(255, 7, 204, 40)
-                      : Colors.black,
-                  size: 60,
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: Text(
+                  'Reset Score',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.blue,
+                  ),
                 ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                // Callback pour le troisième bouton
-                setState(() {
-                  // Toggle light when tapped.
-                  _answerIsOk = !_answerIsOk;
-                });
-              },
-              child: Container(
-                color: Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(8),
-                child: Icon(
-                  Icons.wind_power,
-                  color: _answerIsOk
-                      ? Color.fromARGB(255, 7, 204, 40)
-                      : Colors.black,
-                  size: 60,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                // Callback pour le quatrième bouton
-                setState(() {
-                  // Toggle light when tapped.
-                  _answerIsOk = !_answerIsOk;
-                });
-              },
-              child: Container(
-                color: Color.fromARGB(255, 255, 255, 255),
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                children: <Widget>[
-                  Icon(Icons.star),
-                  SizedBox(width: 8),
-                  Text('Réponse 4'),
-                ],
               ),
             ),
           ],
