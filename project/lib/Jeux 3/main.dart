@@ -36,7 +36,7 @@ class Jeux3 extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
             image: DecorationImage(
-          image: AssetImage('images/fond.png'),
+          image: AssetImage('images/route.jpg'),
           fit: BoxFit.cover,
         )),
         child: Column(
@@ -49,14 +49,51 @@ class Jeux3 extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    bouton('Défi 1', context, null),
-                    bouton('Défi 2', context, null),
-                    bouton('Défi 3', context, null),
+                    
                   ],
                 ))
           ],
         ),
       ),
     ));
+  }
+}
+
+class MyImageWidget extends StatefulWidget {
+  const MyImageWidget({super.key});
+  @override
+  _MyImageWidgetState createState() => _MyImageWidgetState();
+}
+
+class _MyImageWidgetState extends State<MyImageWidget> {
+  double _height = 100.0;
+
+  void _moveImage() {
+    setState(() {
+      _height = 200.0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: GestureDetector(
+          onTap: () {
+            _moveImage();
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            width: 100.0,
+            height: _height,
+            child: Image(
+              image: AssetImage('images/car.png'),
+              
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

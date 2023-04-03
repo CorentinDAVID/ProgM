@@ -69,6 +69,8 @@ flutter:
   assets:
     - images/ic_launcher.png
     - images/fond.png
+    - images/route.jpg
+    - images/car.png
 
   fonts:
     - family: Lobster
