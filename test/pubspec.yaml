@@ -37,6 +37,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_p2p_plus: ^1.0.2
   permission_handler: ^10.2.0
+  wifip2p: ^0.0.1
+  flutter_p2p_connection: ^2.0.1
+  filesystem_picker: ^3.1.0
 
 dev_dependencies:
   flutter_test:
