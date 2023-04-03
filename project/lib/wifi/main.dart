@@ -2,22 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_p2p_connection/flutter_p2p_connection.dart';
+import 'package:project/main.dart';
 
-void main() {
-  runApp(const MaterialApp(
-    title: 'Wifi',
-    home: MultijoueursPage(),
-  ));
-}
-
-class MultijoueursPage extends StatefulWidget {
-  const MultijoueursPage({super.key});
+class Wifi extends StatefulWidget {
+  const Wifi({super.key});
 
   @override
-  State<MultijoueursPage> createState() => _MultijoueursPageState();
+  State<Wifi> createState() => _MultijoueursPageState();
 }
 
-class _MultijoueursPageState extends State<MultijoueursPage> {
+class _MultijoueursPageState extends State<Wifi> {
   final _flutterP2pConnectionPlugin = FlutterP2pConnection();
   WifiP2PInfo? wifiP2PInfo;
 
@@ -59,7 +53,7 @@ class _MultijoueursPageState extends State<MultijoueursPage> {
       if (event.isConnected) {
         setState(() {
           _isConnected = true;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MultijoueursPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));
         });
       }
     });
@@ -107,7 +101,7 @@ class _MultijoueursPageState extends State<MultijoueursPage> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MultijoueursPage()));
+                      MaterialPageRoute(builder: (context) => const StartPage()));
                 },
                 style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
