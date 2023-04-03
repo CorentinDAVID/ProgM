@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../Elements/index.dart';
-import '../Jeux 3/main.dart';
 
-class Training extends StatelessWidget {
-  const Training({super.key});
+class Jeux3 extends StatelessWidget {
+  const Jeux3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +51,7 @@ class Training extends StatelessWidget {
                   children: [
                     bouton('Défi 1', context, null),
                     bouton('Défi 2', context, null),
-                    bouton('Défi 3', context, Jeux3()),
+                    bouton('Défi 3', context, null),
                   ],
                 ))
           ],
@@ -61,5 +60,3 @@ class Training extends StatelessWidget {
     ));
   }
 }
-
-
