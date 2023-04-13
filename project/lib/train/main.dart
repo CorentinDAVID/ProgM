@@ -52,7 +52,7 @@ class Training extends StatelessWidget {
                   children: [
                     bouton('Défi 1', context, null),
                     bouton('Défi 2', context, null),
-                    bouton('Défi 3', context, MyImageWidget()),
+                    bouton('Défi 3', context, Jeux3()),
                   ],
                 ))
           ],
