@@ -42,8 +42,7 @@ dependencies:
   flutter_p2p_plus: ^1.0.2
   permission_handler: ^10.2.0
   flutter_p2p_connection: ^2.0.1
-  microphone: ^0.1.0
-  microphone_stream: ^0.0.5
+  quiver: ^3.2.1
 
 dev_dependencies:
   flutter_test:

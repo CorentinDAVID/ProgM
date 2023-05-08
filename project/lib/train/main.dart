@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/Jeux%204/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 import '../Jeux 3/main.dart';
@@ -53,6 +54,7 @@ class Training extends StatelessWidget {
                     bouton('Défi 1', context, null),
                     bouton('Défi 2', context, null),
                     bouton('Défi 3', context, Jeux3()),
+                    bouton('Défi 4', context, Jeux4())
                   ],
                 ))
           ],
