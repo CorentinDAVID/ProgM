@@ -1,140 +1,120 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:quiver/async.dart';
-import 'dart:math';
+import 'package:project/train/main.dart';
+import '../main.dart';
+import '../Elements/index.dart';
 
-class Jeux4 extends StatelessWidget {
+class Jeux4 extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: GameScreen(),
-    );
-  }
+  _Jeux4State createState() => _Jeux4State();
 }
 
-class GameScreen extends StatefulWidget {
-  @override
-  _GameScreenState createState() => _GameScreenState();
-}
+class _Jeux4State extends State<Jeux4> {
+  int _counter = 0;
+  int _secondsRemaining = 20;
+  late Timer _timer;
 
-class _GameScreenState extends State<GameScreen> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  bool _gameStarted = false;
-  bool _gameOver = false;
-  int _timeRemaining = 60;
-  late CountdownTimer _countdownTimer;
-  Random _random = Random();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: _timeRemaining),
-    )..addListener(() {
-        if (_controller.isCompleted) {
-          setState(() {
-            _gameOver = true;
-          });
-        }
-      });
-
-    _countdownTimer = CountdownTimer(
-      Duration(seconds: _timeRemaining),
-      Duration(seconds: 1),
-    );
-    _countdownTimer.listen((timer) {
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        _timeRemaining = timer.remaining.inSeconds;
+        if (_secondsRemaining > 0) {
+          _secondsRemaining--;
+        } else {
+          _timer.cancel();
+          _showResultDialog();
+        }
       });
     });
   }
 
+  void _showResultDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Game Over'),
+          content: Text('Your score: $_counter'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
-    _controller.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
-  void _handleTapDown(_) {
-    if (!_gameStarted && !_gameOver) {
-      _startGame();
-    }
-    if (_gameStarted && !_gameOver) {
-      _controller.stop();
-      setState(() {
-        _gameOver = true;
-      });
-    }
-  }
-
-  void _handleTapUp(_) {
-    if (_gameStarted && !_gameOver) {
-      _controller.stop();
-      setState(() {
-        _gameOver = true;
-      });
-    }
-  }
-
-  void _startGame() {
+  void _incrementCounter() {
     setState(() {
-      _gameStarted = true;
-      _controller.forward();
+      _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        child: Stack(
-          children: [
-            if (_gameStarted)
-              Positioned(
-                top:  _random.nextDouble() * MediaQuery.of(context).size.width,
-                left:  _random.nextDouble() * MediaQuery.of(context).size.height,
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (BuildContext context, Widget? child) {
-                    return Transform.translate(
-                      offset: Offset(0, _controller.value * MediaQuery.of(context).size.height),
-                      child: child,
-                    );
-                  },
-                  child: GestureDetector(
-                    onTapDown: _handleTapDown,
-                    onTapUp: _handleTapUp,
-                    child: Image.asset('images/car.png'),
-                  ),
+      appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 18, 77, 126),
+          automaticallyImplyLeading: false,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Image.asset(
+                  'images/ic_launcher.png',
+                  fit: BoxFit.contain,
+                  height: 32,
                 ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Training()),
+                  );
+                },
               ),
-            if (!_gameStarted)
-              Center(
-                child: Text(
-                  'Appuyez pour commencer',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
-            Positioned(
-              top: 16,
-              left: 16,
-              child: Text(
-                'Temps restant : $_timeRemaining s',
-                style: TextStyle(fontSize: 18),
-              ),
+              Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: const Text('Projet ProgM'))
+            ],
+          )),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
             ),
-            if (_gameOver)
-              Center(
-                child: Text(
-                  'Game Over',
-                  style: TextStyle(fontSize: 24),
-                ),
-              ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _secondsRemaining > 0 ? _incrementCounter : null,
+              child: Text('Tap Me!'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              '$_secondsRemaining seconds remaining',
+              style: Theme.of(context).textTheme.headline6,
+            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _counter = 0;
+          _secondsRemaining = 20;
+          _startTimer();
+        },
+        tooltip: 'Start Game',
+        child: Icon(Icons.play_arrow),
       ),
     );
   }

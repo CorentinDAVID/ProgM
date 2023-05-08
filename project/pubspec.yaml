@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^10.2.0
   flutter_p2p_connection: ^2.0.1
   quiver: ^3.2.1
+  sensors_plus: ^2.0.5
 
 dev_dependencies:
   flutter_test:
