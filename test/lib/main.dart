@@ -1,65 +1,87 @@
+import 'dart:io';
+
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_p2p_connection/flutter_p2p_connection.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    title: 'Wifi',
-    home: MultijoueursPage(),
-  ));
+  runApp(const MyApp());
 }
 
-class MultijoueursPage extends StatefulWidget {
-  const MultijoueursPage({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  State<MultijoueursPage> createState() => _MultijoueursPageState();
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: MyHomePage(),
+    );
+  }
 }
 
-class _MultijoueursPageState extends State<MultijoueursPage> {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  final TextEditingController msgText = TextEditingController();
   final _flutterP2pConnectionPlugin = FlutterP2pConnection();
+  List<DiscoveredPeers> peers = [];
   WifiP2PInfo? wifiP2PInfo;
-
-  final TextEditingController _controller = TextEditingController();
-  String? _pseudo;
-  bool _isConnected = false;
-
   StreamSubscription<WifiP2PInfo>? _streamWifiInfo;
   StreamSubscription<List<DiscoveredPeers>>? _streamPeers;
+  bool _connected = false;
+  
+  
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _init();
   }
 
   @override
   void dispose() {
-    _flutterP2pConnectionPlugin.removeGroup();
-    _streamWifiInfo?.cancel();
-    _streamPeers?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    _flutterP2pConnectionPlugin.unregister();
+    _flutterP2pConnectionPlugin.closeSocket();
+    _dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _flutterP2pConnectionPlugin.unregister();
+    } else if (state == AppLifecycleState.resumed) {
+      _flutterP2pConnectionPlugin.register();
+    }
+  }
+
+  void _dispose() async{
+    await _flutterP2pConnectionPlugin.stopDiscovery();
+    await _flutterP2pConnectionPlugin.removeGroup();
   }
 
   void _init() async {
     await _flutterP2pConnectionPlugin.initialize();
   }
 
-  void _connect() async {
-    /*String name = _controller.text.trim();
-    print(name);
-    if (name.isEmpty) {
-      return;
-    }*/
+  void _connection() async{
     _streamWifiInfo =
         _flutterP2pConnectionPlugin.streamWifiP2PInfo().listen((event) {
       wifiP2PInfo = event;
       print(event);
       if (event.isConnected) {
         setState(() {
-          _isConnected = true;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => MultijoueursPage()));
+          _connected = true;
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));
         });
       }
     });
@@ -87,163 +109,271 @@ class _MultijoueursPageState extends State<MultijoueursPage> {
     });
   }
 
-  void _setPseudo() {
-    setState(() {
-      _pseudo = _controller.text;
-      _controller.clear();
-    });
+  Future startSocket() async {
+    if (wifiP2PInfo != null) {
+      bool started = await _flutterP2pConnectionPlugin.startSocket(
+        groupOwnerAddress: wifiP2PInfo!.groupOwnerAddress,
+        downloadPath: "/storage/emulated/0/Download/",
+        maxConcurrentDownloads: 2,
+        deleteOnError: true,
+        onConnect: (name, address) {
+          snack("$name connected to socket with address: $address");
+        },
+        transferUpdate: (transfer) {
+          if (transfer.completed) {
+            snack(
+                "${transfer.failed ? "failed to ${transfer.receiving ? "receive" : "send"}" : transfer.receiving ? "received" : "sent"}: ${transfer.filename}");
+          }
+          print(
+              "ID: ${transfer.id}, FILENAME: ${transfer.filename}, PATH: ${transfer.path}, COUNT: ${transfer.count}, TOTAL: ${transfer.total}, COMPLETED: ${transfer.completed}, FAILED: ${transfer.failed}, RECEIVING: ${transfer.receiving}");
+        },
+        receiveString: (req) async {
+          snack(req);
+        },
+      );
+      snack("open socket: $started");
+    }
+  }
+
+  Future connectToSocket() async {
+    if (wifiP2PInfo != null) {
+      await _flutterP2pConnectionPlugin.connectToSocket(
+        groupOwnerAddress: wifiP2PInfo!.groupOwnerAddress,
+        downloadPath: "/storage/emulated/0/Download/",
+        maxConcurrentDownloads: 3,
+        deleteOnError: true,
+        onConnect: (address) {
+          snack("connected to socket: $address");
+        },
+        transferUpdate: (transfer) {
+          // if (transfer.count == 0) transfer.cancelToken?.cancel();
+          if (transfer.completed) {
+            snack(
+                "${transfer.failed ? "failed to ${transfer.receiving ? "receive" : "send"}" : transfer.receiving ? "received" : "sent"}: ${transfer.filename}");
+          }
+          print(
+              "ID: ${transfer.id}, FILENAME: ${transfer.filename}, PATH: ${transfer.path}, COUNT: ${transfer.count}, TOTAL: ${transfer.total}, COMPLETED: ${transfer.completed}, FAILED: ${transfer.failed}, RECEIVING: ${transfer.receiving}");
+        },
+        receiveString: (req) async {
+          snack(req);
+        },
+      );
+    }
+  }
+
+  Future closeSocketConnection() async {
+    bool closed = _flutterP2pConnectionPlugin.closeSocket();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "closed: $closed",
+        ),
+      ),
+    );
+  }
+
+  Future sendMessage() async {
+    _flutterP2pConnectionPlugin.sendStringToSocket(msgText.text);
+  }
+
+  Future sendFile(bool phone) async {
+    String? filePath = await FilesystemPicker.open(
+      context: context,
+      rootDirectory: Directory(phone ? "/storage/emulated/0/" : "/storage/"),
+      fsType: FilesystemType.file,
+      fileTileSelectMode: FileTileSelectMode.wholeTile,
+      showGoUp: true,
+      folderIconColor: Colors.blue,
+    );
+    if (filePath == null) return;
+    List<TransferUpdate>? updates =
+        await _flutterP2pConnectionPlugin.sendFiletoSocket(
+      [
+        filePath,
+        // "/storage/emulated/0/Download/Likee_7100105253123033459.mp4",
+        // "/storage/0E64-4628/Download/Adele-Set-Fire-To-The-Rain-via-Naijafinix.com_.mp3",
+        // "/storage/0E64-4628/Flutter SDK/p2p_plugin.apk",
+        // "/storage/emulated/0/Download/03 Omah Lay - Godly (NetNaija.com).mp3",
+        // "/storage/0E64-4628/Download/Adele-Set-Fire-To-The-Rain-via-Naijafinix.com_.mp3",
+      ],
+    );
+    print(updates);
+  }
+
+  void snack(String msg) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 2),
+        content: Text(
+          msg,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 99, 71, 255),
-      body: SafeArea(
-        child: ListView(
+      appBar: AppBar(
+        title: const Text('Flutter p2p connection plugin'),
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.only(top: 10, right: 20),
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MultijoueursPage()));
-                },
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        Color.fromARGB(255, 162, 136, 255)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ))),
-                child: const Icon(Icons.close, color: Colors.white),
+            Text(
+                "IP: ${wifiP2PInfo == null ? "null" : wifiP2PInfo?.groupOwnerAddress}"),
+            wifiP2PInfo != null
+                ? Text(
+                    "connected: ${wifiP2PInfo?.isConnected}, isGroupOwner: ${wifiP2PInfo?.isGroupOwner}, groupFormed: ${wifiP2PInfo?.groupFormed}, groupOwnerAddress: ${wifiP2PInfo?.groupOwnerAddress}, clients: ${wifiP2PInfo?.clients}")
+                : const SizedBox.shrink(),
+            const SizedBox(height: 10),
+            const Text("PEERS:"),
+            SizedBox(
+              height: 100,
+              width: MediaQuery.of(context).size.width,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: peers.length,
+                itemBuilder: (context, index) => Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => Center(
+                          child: AlertDialog(
+                            content: SizedBox(
+                              height: 200,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("name: ${peers[index].deviceName}"),
+                                  Text(
+                                      "address: ${peers[index].deviceAddress}"),
+                                  Text(
+                                      "isGroupOwner: ${peers[index].isGroupOwner}"),
+                                  Text(
+                                      "isServiceDiscoveryCapable: ${peers[index].isServiceDiscoveryCapable}"),
+                                  Text(
+                                      "primaryDeviceType: ${peers[index].primaryDeviceType}"),
+                                  Text(
+                                      "secondaryDeviceType: ${peers[index].secondaryDeviceType}"),
+                                  Text("status: ${peers[index].status}"),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  bool? bo = await _flutterP2pConnectionPlugin
+                                      .connect(peers[index].deviceAddress);
+                                  snack("connected: $bo");
+                                },
+                                child: const Text("connect"),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 80,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Center(
+                        child: Text(
+                          peers[index]
+                              .deviceName
+                              .toString()
+                              .characters
+                              .first
+                              .toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 200),
-            _pseudo == null
-                ? Column(
-                    children: [
-                      Container(
-                        width: 300,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(10),
-                            color: Color.fromARGB(255, 136, 154, 255)),
-                        child: Column(children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20, bottom: 20),
-                            child: Text('nom',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
+            ElevatedButton(
+              onPressed: () async {
+                bool? created = await _flutterP2pConnectionPlugin.createGroup();
+                snack("created group: $created");
+              },
+              child: const Text("create group"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                var info = await _flutterP2pConnectionPlugin.groupInfo();
+                showDialog(
+                  context: context,
+                  builder: (context) => Center(
+                    child: Dialog(
+                      child: SizedBox(
+                        height: 200,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "groupNetworkName: ${info?.groupNetworkName}"),
+                              Text("passPhrase: ${info?.passPhrase}"),
+                              Text("isGroupOwner: ${info?.isGroupOwner}"),
+                              Text("clients: ${info?.clients}"),
+                            ],
                           ),
-                          TextField(
-                            controller: _controller,
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Color.fromARGB(255, 74, 71, 255),
-                              labelText: "Pseudo",
-                              labelStyle: TextStyle(color: Colors.white),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      width: 1,
-                                      color: Color.fromARGB(255, 71, 99, 255))),
-                              constraints: BoxConstraints(maxWidth: 220),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ]),
+                        ),
                       ),
-                      const SizedBox(height: 30),
-                      Container(
-                          width: 300,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(10),
-                              color: Color.fromARGB(255, 20, 130, 255)),
-                          child: TextButton(
-                            onPressed: () {
-                              if (_controller.text.isEmpty) {
-                                return;
-                              } else {
-                                _setPseudo();
-                                _connect();
-                              }
-                            },
-                            child: const Text('VALIDER',
-                                style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ))
-                    ],
-                  )
-                : _isConnected
-                    ? //Container()
-                    Column(
-                        children: [
-                          Container(
-                            width: 300,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color.fromARGB(255, 136, 138, 255)),
-                            child:  Column(children: const[
-                              Padding(
-                                padding: EdgeInsets.only(top: 20, bottom: 20),
-                                child: Text('Joueurs connectés : ',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              SizedBox(height: 20),
-                            ]),
-                          ),
-                          const SizedBox(height: 30),
-                          Container(
-                              width: 300,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Color.fromARGB(255, 20, 24, 255)),
-                              child: TextButton(
-                                onPressed: () {},
-                                child: const Text('JOUER',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              )),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          Container(
-                            width: 300,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                                color: Color.fromARGB(255, 138, 136, 255)),
-                            child:  Column(children: const [
-                              Padding(
-                                padding: EdgeInsets.only(top: 20, bottom: 20),
-                                child: Text('En attente des autres joueurs...',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              SizedBox(height: 10),
-                              CircularProgressIndicator(),
-                              SizedBox(height: 20),
-                            ]),
-                          ),
-                        ],
-                      ),
+                    ),
+                  ),
+                );
+              },
+              child: const Text("get group info"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if(peers.isNotEmpty){
+                  for(DiscoveredPeers peer in peers){
+                    print('Nom du portable connecté: ${peer.deviceName}');
+                  }
+                }
+                else{
+                  print('Aucun portable detecté');
+                }
+              },
+              child: const Text("Recherche d'appareil"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                _connection();
+              },
+              child: const Text("Connexion avec l'adversaire"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                startSocket();
+              },
+              child: const Text("open a socket"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                connectToSocket();
+              },
+              child: const Text("connect to socket"),
+            ),
           ],
         ),
       ),
