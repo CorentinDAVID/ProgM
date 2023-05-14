@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:project/lounge/gestionPartie.dart';
 import 'package:project/train/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 
-class Jeux4 extends StatefulWidget {
+class Jeux4Multi extends StatefulWidget {
   @override
-  _Jeux4State createState() => _Jeux4State();
+  _Jeux4MultiState createState() => _Jeux4MultiState();
 }
 
-class _Jeux4State extends State<Jeux4> {
+class _Jeux4MultiState extends State<Jeux4Multi> {
   int _counter = 0;
   int _secondsRemaining = 20;
   late Timer _timer;
@@ -21,30 +22,11 @@ class _Jeux4State extends State<Jeux4> {
           _secondsRemaining--;
         } else {
           _timer.cancel();
-          _showResultDialog();
+          addWinner("Joueur1");
+          gestion(context);
         }
       });
     });
-  }
-
-  void _showResultDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Game Over'),
-          content: Text('Your score: $_counter'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override

@@ -1,15 +1,13 @@
-import 'dart:ffi';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:project/Jeux3/main.dart';
 import 'package:project/Jeux4/training.dart';
 import 'package:project/lounge/gestionPartie.dart';
 import '../main.dart';
 import '../Elements/index.dart';
+import '../Jeux3/main.dart';
+import '../lounge/main.dart';
 
-class Lounge extends StatelessWidget {
-  const Lounge({super.key});
+class Resultat extends StatelessWidget {
+  const Resultat({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,20 +53,9 @@ class Lounge extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                        foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
-                      ),
-                      onPressed: () {
-                        starGame();
-                        Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => currentGame),
-                        );
-                      },
-                      child: Text('Lets go !!'),
-                    )
+                    Text(gagnant,
+    textAlign: TextAlign.center,
+    style: TextStyle(color: Colors.white, fontSize: 70, fontFamily: 'Lobster'))
                   ],
                 ))
           ],
@@ -77,4 +64,5 @@ class Lounge extends StatelessWidget {
     ));
   }
 }
+
 
