@@ -97,6 +97,7 @@ class _Jeux2State extends State<Jeux2> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height * _kHeightFraction;
+    final width = MediaQuery.of(context).size.width;
 
     return MaterialApp(
       title:
@@ -108,37 +109,39 @@ class _Jeux2State extends State<Jeux2> {
         ),
         body: Column(
           children: [
-            Container(
-              height: height,
-              child: FlutterMap(
-                mapController: _mapController,
-                options: MapOptions(
-                  center: _center,
-                  zoom: 2.0,
-                  onTap: _moveMarker,
-                ),
-                layers: [
-                  TileLayerOptions(
-                    urlTemplate:
-                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    subdomains: ['a', 'b', 'c'],
+            Expanded(
+              child: Container(
+                height: height,
+                child: FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    center: _center,
+                    zoom: 2.0,
+                    onTap: _moveMarker,
                   ),
-                  MarkerLayerOptions(
-                    markers: [
-                      Marker(
-                        width: 80.0,
-                        height: 80.0,
-                        point: _markerPosition,
-                        builder: (ctx) => Container(
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Colors.red,
+                  layers: [
+                    TileLayerOptions(
+                      urlTemplate:
+                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      subdomains: ['a', 'b', 'c'],
+                    ),
+                    MarkerLayerOptions(
+                      markers: [
+                        Marker(
+                          width: 80.0,
+                          height: 80.0,
+                          point: _markerPosition,
+                          builder: (ctx) => Container(
+                            child: Icon(
+                              Icons.location_pin,
+                              color: Colors.red,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             Row(
