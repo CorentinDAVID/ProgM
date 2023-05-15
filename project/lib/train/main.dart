@@ -54,7 +54,7 @@ class Training extends StatelessWidget {
                   children: [
                     bouton('Défi 1', context, null),
                     bouton('Défi 2', context, Lounge()),
-                    bouton('Défi 3', context, Jeux3()),
+                    bouton('Défi 3', context, ShakeGame()),
                     bouton('Défi 4', context, Jeux4())
                   ],
                 ))
@@ -64,5 +64,3 @@ class Training extends StatelessWidget {
     ));
   }
 }
-
-
