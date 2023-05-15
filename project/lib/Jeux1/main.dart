@@ -3,10 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-void main() => runApp(const MyApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Jeux1 extends StatelessWidget {
+  const Jeux1({Key? key}) : super(key: key);
 
   static const String _title = 'Flutter Code Sample';
 

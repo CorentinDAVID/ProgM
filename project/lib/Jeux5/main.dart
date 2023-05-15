@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math';
 
-void main() {
-  runApp(MazeGame());
-}
-
 class MazeGame extends StatefulWidget {
   @override
   _MazeGameState createState() => _MazeGameState();

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:project/Jeux1/main.dart';
+import 'package:project/Jeux2/main.dart';
 import 'package:project/Jeux4/training.dart';
+import 'package:project/Jeux5/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 import '../Jeux3/main.dart';
@@ -52,10 +55,12 @@ class Training extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    bouton('Défi 1', context, null),
-                    bouton('Défi 2', context, Lounge()),
+                    bouton('Défi 1', context, Jeux1()),
+                    bouton('Défi 2', context, Jeux2()),
                     bouton('Défi 3', context, ShakeGame()),
-                    bouton('Défi 4', context, Jeux4())
+                    bouton('Défi 4', context, Jeux4()),
+                    bouton('Défi 5', context, MazeGame()),
+                    bouton('lounge', context, Lounge())
                   ],
                 ))
           ],

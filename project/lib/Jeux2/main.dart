@@ -6,14 +6,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
+class Jeux2 extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _Jeux2State createState() => _Jeux2State();
 }
 
-class _MyAppState extends State<MyApp> {
+class _Jeux2State extends State<Jeux2> {
   String _countryName = 'Loading...';
   LatLng _center = LatLng(0.0, 0.0);
   static const double _kHeightFraction = 0.8;
