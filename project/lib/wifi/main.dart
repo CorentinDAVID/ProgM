@@ -2,16 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_p2p_connection/flutter_p2p_connection.dart';
+import 'package:project/lounge/main.dart';
 import 'package:project/main.dart';
+
 
 class Wifi extends StatefulWidget {
   const Wifi({super.key});
 
   @override
-  State<Wifi> createState() => _MultijoueursPageState();
+  State<Wifi> createState() => _WifiState();
 }
 
-class _MultijoueursPageState extends State<Wifi> {
+class _WifiState extends State<Wifi> {
   final _flutterP2pConnectionPlugin = FlutterP2pConnection();
   WifiP2PInfo? wifiP2PInfo;
 
@@ -53,7 +55,7 @@ class _MultijoueursPageState extends State<Wifi> {
       if (event.isConnected) {
         setState(() {
           _isConnected = true;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => StartPage()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Lounge()));
         });
       }
     });
@@ -91,7 +93,7 @@ class _MultijoueursPageState extends State<Wifi> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 99, 71, 255),
+      backgroundColor: const Color.fromARGB(255, 255, 71, 71),
       body: SafeArea(
         child: ListView(
           children: [
@@ -105,7 +107,7 @@ class _MultijoueursPageState extends State<Wifi> {
                 },
                 style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
-                        Color.fromARGB(255, 162, 136, 255)),
+                        const Color.fromARGB(255, 255, 136, 136)),
                     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -122,11 +124,11 @@ class _MultijoueursPageState extends State<Wifi> {
                         decoration: BoxDecoration(
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(10),
-                            color: Color.fromARGB(255, 136, 154, 255)),
+                            color: const Color.fromARGB(255, 255, 136, 136)),
                         child: Column(children: [
                           const Padding(
                             padding: EdgeInsets.only(top: 20, bottom: 20),
-                            child: Text('nom',
+                            child: Text('ENTREZ UN PSEUDO',
                                 style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
@@ -136,13 +138,13 @@ class _MultijoueursPageState extends State<Wifi> {
                             controller: _controller,
                             decoration: const InputDecoration(
                               filled: true,
-                              fillColor: Color.fromARGB(255, 74, 71, 255),
+                              fillColor: Color.fromARGB(255, 255, 71, 71),
                               labelText: "Pseudo",
                               labelStyle: TextStyle(color: Colors.white),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                       width: 1,
-                                      color: Color.fromARGB(255, 71, 99, 255))),
+                                      color: Color.fromARGB(255, 255, 71, 71))),
                               constraints: BoxConstraints(maxWidth: 220),
                             ),
                           ),
@@ -156,7 +158,7 @@ class _MultijoueursPageState extends State<Wifi> {
                           decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(10),
-                              color: Color.fromARGB(255, 20, 130, 255)),
+                              color: const Color.fromARGB(255, 255, 95, 20)),
                           child: TextButton(
                             onPressed: () {
                               if (_controller.text.isEmpty) {
@@ -183,8 +185,8 @@ class _MultijoueursPageState extends State<Wifi> {
                             decoration: BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(10),
-                                color: Color.fromARGB(255, 136, 138, 255)),
-                            child:  Column(children: const[
+                                color: const Color.fromARGB(255, 255, 136, 136)),
+                            child: Column(children: [
                               Padding(
                                 padding: EdgeInsets.only(top: 20, bottom: 20),
                                 child: Text('Joueurs connectés : ',
@@ -203,7 +205,7 @@ class _MultijoueursPageState extends State<Wifi> {
                               decoration: BoxDecoration(
                                   shape: BoxShape.rectangle,
                                   borderRadius: BorderRadius.circular(10),
-                                  color: Color.fromARGB(255, 20, 24, 255)),
+                                  color: const Color.fromARGB(255, 255, 95, 20)),
                               child: TextButton(
                                 onPressed: () {},
                                 child: const Text('JOUER',
@@ -221,8 +223,8 @@ class _MultijoueursPageState extends State<Wifi> {
                             decoration: BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(10),
-                                color: Color.fromARGB(255, 138, 136, 255)),
-                            child:  Column(children: const [
+                                color: const Color.fromARGB(255, 255, 136, 136)),
+                            child: Column(children: [
                               Padding(
                                 padding: EdgeInsets.only(top: 20, bottom: 20),
                                 child: Text('En attente des autres joueurs...',

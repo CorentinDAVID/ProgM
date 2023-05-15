@@ -178,10 +178,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_p2p_connection
-      sha256: "788b228c89a5260be1ef539584a2f7a78df853056df51ae8f0e8aa459a6bc6a0"
+      sha256: "10704b893b47f0ff1b647180854b989cbe62d242238c2395954a0b7d3250658f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "1.0.9"
   flutter_p2p_plus:
     dependency: "direct main"
     description:
