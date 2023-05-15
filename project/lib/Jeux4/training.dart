@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:project/solo/gestion.dart';
 import 'package:project/train/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
@@ -21,31 +22,13 @@ class _Jeux4State extends State<Jeux4> {
           _secondsRemaining--;
         } else {
           _timer.cancel();
-          _showResultDialog();
+          mancheWin = _counter > 50;
+          gestion(context);
         }
       });
     });
   }
 
-  void _showResultDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Game Over'),
-          content: Text('Your score: $_counter'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   void dispose() {

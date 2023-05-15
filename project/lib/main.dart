@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/solo/gestion.dart';
 import 'train/main.dart';
 import 'Elements/index.dart';
 import 'lounge/main.dart';
@@ -56,7 +57,18 @@ class StartPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   bouton('Play', context, Wifi()),
-                  bouton('Training', context, const Training())
+                  bouton('Training', context, const Training()),
+                  ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                        foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+                      ),
+                      onPressed: () {
+                        gestion(context);
+                        
+                      },
+                      child: Text('Solo'),
+                    )
                 ],
               ),
             )
