@@ -57,7 +57,6 @@ class StartPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   bouton('Play', context, ConnectionWidget()),
-                  bouton('Training', context, const Training()),
                   ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
@@ -68,7 +67,9 @@ class StartPage extends StatelessWidget {
                         
                       },
                       child: Text('Solo'),
-                    )
+                    ),
+                  bouton('Training', context, const Training()),
+                  
                 ],
               ),
             )
@@ -88,6 +89,6 @@ const wallpaper = BoxDecoration(
   fit: BoxFit.cover,
 ));
 
-const background_text = Text('Play a game',
+const background_text = Text('Project game',
     textAlign: TextAlign.center,
     style: TextStyle(color: Colors.white, fontSize: 70, fontFamily: 'Lobster'));

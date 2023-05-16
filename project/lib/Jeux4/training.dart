@@ -5,12 +5,12 @@ import 'package:project/train/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 
-class Jeux4 extends StatefulWidget {
+class Jeux4Train extends StatefulWidget {
   @override
   _Jeux4State createState() => _Jeux4State();
 }
 
-class _Jeux4State extends State<Jeux4> {
+class _Jeux4State extends State<Jeux4Train> {
   int _counter = 0;
   int _secondsRemaining = 20;
   late Timer _timer;

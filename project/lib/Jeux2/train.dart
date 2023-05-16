@@ -132,7 +132,7 @@ class _Jeux2State extends State<Jeux2Train> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(
-              'Guess the country - Score: $_score - Country: $_countryName'),
+              'Country: $_countryName'),
         ),
         body: Column(
           children: [

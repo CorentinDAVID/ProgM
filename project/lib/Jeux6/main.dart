@@ -4,6 +4,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:project/solo/gestion.dart';
 
+void main() {
+  runApp(MaterialApp(
+    home: MemoryGame(),
+  ));
+}
+
 class MemoryGame extends StatefulWidget {
   @override
   _MemoryGameState createState() => _MemoryGameState();
@@ -24,16 +30,16 @@ class _MemoryGameState extends State<MemoryGame> {
   ];
 
   List<String> flags = [
-    '🇺🇸',
-    '🇨🇦',
-    '🇫🇷',
-    '🇩🇪',
-    '🇮🇹',
-    '🇯🇵',
-    '🇷🇺',
-    '🇧🇷',
-    '🇨🇳',
-    '🇮🇳',
+    '\uD83C\uDDFA\uD83C\uDDF8',
+    '\uD83C\uDDE8\uD83C\uDDE6',
+    '\uD83C\uDDEB\uD83C\uDDF7',
+    '\uD83C\uDDE9\uD83C\uDDEA',
+    '\uD83C\uDDEE\uD83C\uDDF9',
+    '\uD83C\uDDEF\uD83C\uDDF5',
+    '\uD83C\uDDF7\uD83C\uDDFA',
+    '\uD83C\uDDE7\uD83C\uDDF7',
+    '\uD83C\uDDE8\uD83C\uDDF3',
+    '\uD83C\uDDEE\uD83C\uDDF3',
   ];
 
   List<String> cards = [];
@@ -123,7 +129,8 @@ class _MemoryGameState extends State<MemoryGame> {
             cardFlips[previousIndex] = false;
             cardFlips[currentIndex] = false;
             currentPlayer = currentPlayer == 1 ? 2 : 1;
-            gameLocked = false;
+            gameLocked =
+            false;
           });
         });
       }
