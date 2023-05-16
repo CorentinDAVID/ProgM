@@ -39,12 +39,39 @@ class _Jeux2State extends State<Jeux2> {
   }
 
   void _loadRandomCountry() {
-    final random = Random();
-    final countryName = _countries[random.nextInt(_countries.length)];
+    if (_score >= 3) {
+      // Terminer le jeu
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Game Over'),
+          content: Text('Score: $_score'),
+          actions: [
+            TextButton(
+              child: Text('Restart'),
+              onPressed: () {
+                Navigator.pop(context);
+                _restartGame();
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      final random = Random();
+      final countryName = _countries[random.nextInt(_countries.length)];
+      setState(() {
+        _countryName = countryName;
+      });
+      _getCountryLocation();
+    }
+  }
+
+  void _restartGame() {
     setState(() {
-      _countryName = countryName;
+      _score = 0;
     });
-    _getCountryLocation();
+    _loadRandomCountry();
   }
 
   void _getCountryLocation() async {
