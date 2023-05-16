@@ -4,12 +4,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:project/solo/gestion.dart';
 
-class MemoryGame extends StatefulWidget {
+class MemoryGameTrain extends StatefulWidget {
   @override
   _MemoryGameState createState() => _MemoryGameState();
 }
 
-class _MemoryGameState extends State<MemoryGame> {
+class _MemoryGameState extends State<MemoryGameTrain> {
   List<String> countries = [
     'USA',
     'Canada',
@@ -111,8 +111,6 @@ class _MemoryGameState extends State<MemoryGame> {
           matchedPairs++;
           if (matchedPairs == countries.length) {
             gameOver = true;
-            mancheWin = true;
-            gestion(context);
           }
         });
       } else {

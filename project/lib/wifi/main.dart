@@ -5,7 +5,7 @@ import 'package:flutter_p2p_connection/flutter_p2p_connection.dart';
 import 'package:project/Jeux1/main.dart';
 import 'package:project/Jeux2/main.dart';
 import 'package:project/Jeux3/main.dart';
-import 'package:project/Jeux4/multi.dart';
+import 'package:project/Jeux4/main.dart';
 import 'package:project/Jeux5/main.dart';
 import 'package:project/Jeux6/main.dart';
 import 'package:project/wifi/resultat.dart';
@@ -14,7 +14,7 @@ bool _isHost = false;
 var myScore;
 var isScore;
 List<String> winner = [];
-List<dynamic> lsGames = [Jeux1(),Jeux2(),ShakeGame(),Jeux4Multi(),MazeGame(),MemoryGame()];
+List<dynamic> lsGames = [Jeux1(),Jeux2(),ShakeGame(),Jeux4(),MazeGame(),MemoryGame()];
 var currentGame;
 var vainqueur;
 

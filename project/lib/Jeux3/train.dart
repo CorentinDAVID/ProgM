@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:project/solo/gestion.dart';
 import 'package:sensors/sensors.dart';
 
-void main() => runApp(ShakeGame());
-
-class ShakeGame extends StatefulWidget {
+class ShakeGameTrain extends StatefulWidget {
   @override
   _ShakeGameState createState() => _ShakeGameState();
 }
 
-class _ShakeGameState extends State<ShakeGame> {
+class _ShakeGameState extends State<ShakeGameTrain> {
   static const int targetScore = 100;
   static const int minScore = 50;
   int currentScore = 0;
@@ -43,10 +40,25 @@ class _ShakeGameState extends State<ShakeGame> {
   }
 
   void endGame() {
-    mancheWin = currentScore == targetScore;
-    gestion(context);
     setState(() {
       isGameStarted = false;
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Résultat du jeu'),
+            content: Text('Score final: $currentScore'),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     });
   }
 

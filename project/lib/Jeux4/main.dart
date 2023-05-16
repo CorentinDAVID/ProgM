@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:project/solo/gestion.dart';
 import 'package:project/train/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 
-class Jeux4Multi extends StatefulWidget {
+class Jeux4 extends StatefulWidget {
   @override
-  _Jeux4MultiState createState() => _Jeux4MultiState();
+  _Jeux4State createState() => _Jeux4State();
 }
 
-class _Jeux4MultiState extends State<Jeux4Multi> {
+class _Jeux4State extends State<Jeux4> {
   int _counter = 0;
   int _secondsRemaining = 20;
   late Timer _timer;
@@ -21,7 +22,7 @@ class _Jeux4MultiState extends State<Jeux4Multi> {
           _secondsRemaining--;
         } else {
           _timer.cancel();
-          addWinner("Joueur1");
+          mancheWin = _counter >= 100;
           gestion(context);
         }
       });

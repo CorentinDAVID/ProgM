@@ -22,8 +22,7 @@ class _Jeux4State extends State<Jeux4> {
           _secondsRemaining--;
         } else {
           _timer.cancel();
-          mancheWin = _counter > 50;
-          gestion(context);
+          showAlertDialog();
         }
       });
     });
@@ -40,6 +39,28 @@ class _Jeux4State extends State<Jeux4> {
     setState(() {
       _counter++;
     });
+  }
+
+  void showAlertDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Score'),
+          content:
+              Text('Vous avez obtenu $_counter points.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

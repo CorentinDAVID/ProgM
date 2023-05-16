@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:project/solo/gestion.dart';
 import 'package:sensors/sensors.dart';
 import 'dart:math';
 
-class MazeGame extends StatefulWidget {
+class MazeGameTrain extends StatefulWidget {
   @override
   _MazeGameState createState() => _MazeGameState();
 }
 
-class _MazeGameState extends State<MazeGame> {
+class _MazeGameState extends State<MazeGameTrain> {
   double ballX = 0.0;
   double ballY = 0.0;
   double mazeWidth = 300.0;
@@ -107,8 +106,23 @@ class _MazeGameState extends State<MazeGame> {
       setState(() {
         gameFinished = true;
       });
-      mancheWin = true;
-      gestion(context);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Félicitations !'),
+            content: Text('Vous avez atteint la sortie du labyrinthe.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
 
     if (ballX + 20 >= obstacle1X &&
@@ -120,8 +134,23 @@ class _MazeGameState extends State<MazeGame> {
         lives--;
         if (lives == 0) {
           gameFinished = true;
-          mancheWin = false;
-          gestion(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Game Over'),
+                content: Text('Vous avez été éliminé. Vies restantes : $lives'),
+                actions: [
+                  TextButton(
+                    child: Text('OK'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         }
       });
     }

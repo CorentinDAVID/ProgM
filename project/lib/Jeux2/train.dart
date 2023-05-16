@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
-import 'package:project/solo/gestion.dart';
 
-class Jeux2 extends StatefulWidget {
+class Jeux2Train extends StatefulWidget {
   @override
   _Jeux2State createState() => _Jeux2State();
 }
 
-class _Jeux2State extends State<Jeux2> {
+class _Jeux2State extends State<Jeux2Train> {
   String _countryName = 'Loading...';
   LatLng _center = LatLng(0.0, 0.0);
   static const double _kHeightFraction = 0.8;
@@ -42,8 +41,22 @@ class _Jeux2State extends State<Jeux2> {
   void _loadRandomCountry() {
     if (_score >= 3) {
       // Terminer le jeu
-      mancheWin = true;
-      gestion(context);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Game Over'),
+          content: Text('Score: $_score'),
+          actions: [
+            TextButton(
+              child: Text('Restart'),
+              onPressed: () {
+                Navigator.pop(context);
+                _restartGame();
+              },
+            ),
+          ],
+        ),
+      );
     } else {
       final random = Random();
       final countryName = _countries[random.nextInt(_countries.length)];

@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project/solo/gestion.dart';
+import '../wifi/main.dart';
 
 
-class Jeux1 extends StatelessWidget {
-  const Jeux1({Key? key}) : super(key: key);
+class Jeux1Train extends StatelessWidget {
+  const Jeux1Train({Key? key}) : super(key: key);
 
   static const String _title = 'Flutter Code Sample';
 
@@ -114,8 +114,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   void _pickRandomQuestion() {
     if (_questionCount == _totalQuestions) {
 // Toutes les questions ont été répondues, afficher le score
-      mancheWin = _score >= 7;
-      gestion(context);
+      _showScoreDialog();
       return;
     }
 
