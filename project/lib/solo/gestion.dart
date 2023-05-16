@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:project/Jeux3/main.dart';
 import 'package:project/Jeux4/multi.dart';
 import 'package:project/Jeux4/training.dart';
-import 'package:project/lounge/resultat.dart';
+import 'package:project/wifi/resultat.dart';
 import 'package:project/solo/lose.dart';
 import 'package:project/solo/win.dart';
 import '../main.dart';

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project/Jeux4/training.dart';
-import 'package:project/lounge/gestionPartie.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 import '../Jeux3/main.dart';
-import '../lounge/main.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class Win extends StatefulWidget {

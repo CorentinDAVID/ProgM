@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../wifi/main.dart';
 
 
 class Jeux1 extends StatelessWidget {
@@ -114,6 +115,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     if (_questionCount == _totalQuestions) {
 // Toutes les questions ont été répondues, afficher le score
       _showScoreDialog();
+      finDeManche(_score);
       return;
     }
 

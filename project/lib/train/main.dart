@@ -6,7 +6,7 @@ import 'package:project/Jeux5/main.dart';
 import '../main.dart';
 import '../Elements/index.dart';
 import '../Jeux3/main.dart';
-import '../lounge/main.dart';
+
 
 class Training extends StatelessWidget {
   const Training({super.key});
@@ -60,7 +60,6 @@ class Training extends StatelessWidget {
                     bouton('Défi 3', context, ShakeGame()),
                     bouton('Défi 4', context, Jeux4()),
                     bouton('Défi 5', context, MazeGame()),
-                    bouton('lounge', context, Lounge())
                   ],
                 ))
           ],
