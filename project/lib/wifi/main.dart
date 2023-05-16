@@ -1,28 +1,33 @@
-import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_p2p_connection/flutter_p2p_connection.dart';
-import 'package:project/lounge/main.dart';
-import 'package:project/main.dart';
+import 'package:project/Jeux1/main.dart';
+import 'package:project/Jeux2/main.dart';
+import 'package:project/Jeux3/main.dart';
+import 'package:project/Jeux4/multi.dart';
+import 'package:project/Jeux5/main.dart';
+import 'package:project/Jeux6/main.dart';
+import 'package:project/wifi/resultat.dart';
 
+bool _isHost = false;
+var myScore;
+var isScore;
+List<String> winner = [];
+List<dynamic> lsGames = [Jeux1(),Jeux2(),ShakeGame(),Jeux4Multi(),MazeGame(),MemoryGame()];
+var currentGame;
+var vainqueur;
 
-class Wifi extends StatefulWidget {
-  const Wifi({super.key});
-
+class ConnectionWidget extends StatefulWidget {
   @override
-  State<Wifi> createState() => _WifiState();
+  _ConnectionWidgetState createState() => _ConnectionWidgetState();
 }
 
-class _WifiState extends State<Wifi> {
-  final _flutterP2pConnectionPlugin = FlutterP2pConnection();
-  WifiP2PInfo? wifiP2PInfo;
-
-  final TextEditingController _controller = TextEditingController();
-  String? _pseudo;
+class _ConnectionWidgetState extends State<ConnectionWidget> {
+  final FlutterP2pConnection _flutterP2pConnectionPlugin = FlutterP2pConnection();
   bool _isConnected = false;
-
-  StreamSubscription<WifiP2PInfo>? _streamWifiInfo;
-  StreamSubscription<List<DiscoveredPeers>>? _streamPeers;
+  WifiP2PInfo? wifiP2PInfo;
+  
 
   @override
   void initState() {
@@ -33,8 +38,6 @@ class _WifiState extends State<Wifi> {
   @override
   void dispose() {
     _flutterP2pConnectionPlugin.removeGroup();
-    _streamWifiInfo?.cancel();
-    _streamPeers?.cancel();
     super.dispose();
   }
 
@@ -43,22 +46,6 @@ class _WifiState extends State<Wifi> {
   }
 
   void _connect() async {
-    /*String name = _controller.text.trim();
-    print(name);
-    if (name.isEmpty) {
-      return;
-    }*/
-    _streamWifiInfo =
-        _flutterP2pConnectionPlugin.streamWifiP2PInfo().listen((event) {
-      wifiP2PInfo = event;
-      print(event);
-      if (event.isConnected) {
-        setState(() {
-          _isConnected = true;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Lounge()));
-        });
-      }
-    });
     if (!await _flutterP2pConnectionPlugin.checkStoragePermission()) {
       _flutterP2pConnectionPlugin.askStoragePermission();
     }
@@ -73,176 +60,222 @@ class _WifiState extends State<Wifi> {
     }
     _flutterP2pConnectionPlugin.register();
     _flutterP2pConnectionPlugin.discover();
-    _streamPeers = _flutterP2pConnectionPlugin.streamPeers().listen((event) {
-      print(event);
+    _flutterP2pConnectionPlugin.streamPeers().listen((List<DiscoveredPeers> event) {
       if (event.isNotEmpty) {
         for (int i = 0; i < event.length; i++) {
           _flutterP2pConnectionPlugin.connect(event[i].deviceAddress);
         }
       }
     });
+    _flutterP2pConnectionPlugin.streamWifiP2PInfo().listen((event) {
+      wifiP2PInfo = event;
+      if (event.isConnected) {
+        setState(() {
+          _isConnected = true;
+        });
+      }
+    });
+
+    print(_isConnected);
   }
 
-  void _setPseudo() {
-    setState(() {
-      _pseudo = _controller.text;
-      _controller.clear();
-    });
+  Future _startSocket() async {
+    if (wifiP2PInfo != null) {
+      await _flutterP2pConnectionPlugin.startSocket(
+        groupOwnerAddress: wifiP2PInfo!.groupOwnerAddress!,
+        downloadPath: "/storage/emulated/0/Download/",
+        maxConcurrentDownloads: 2,
+        deleteOnError: true,
+        onConnect: (name, address) {
+          print("$name connected to socket with address: $address");
+        },
+        transferUpdate: (transfer) {
+          print(
+              "ID: ${transfer.id}, FILENAME: ${transfer.filename}, PATH: ${transfer.path}, COUNT: ${transfer.count}, TOTAL: ${transfer.total}, COMPLETED: ${transfer.completed}, FAILED: ${transfer.failed}, RECEIVING: ${transfer.receiving}");
+        },
+        receiveString: (req) async {
+          print(req);
+          isScore = req as int;
+          if(isScore > myScore){
+            winner.add('Joueur2');
+          }
+          else{winner.add('Joueur1');}
+        },
+      );
+    }
   }
+
+  Future _connectToSocket() async {
+    if (wifiP2PInfo != null) {
+      await _flutterP2pConnectionPlugin.connectToSocket(
+        groupOwnerAddress: wifiP2PInfo!.groupOwnerAddress!,
+        downloadPath: "/storage/emulated/0/Download/",
+        maxConcurrentDownloads: 2,
+        deleteOnError: true,
+        onConnect: (address) {
+          print("connected to socket: $address");
+        },
+        transferUpdate: (transfer) {
+          print(
+              "ID: ${transfer.id}, FILENAME: ${transfer.filename}, PATH: ${transfer.path}, COUNT: ${transfer.count}, TOTAL: ${transfer.total}, COMPLETED: ${transfer.completed}, FAILED: ${transfer.failed}, RECEIVING: ${transfer.receiving}");
+        },
+        receiveString: (req) async {
+          print(req);
+          if(req == 'score'){
+            showAlertDialog(context, 'message', 'hello');
+          }
+          else if(req == 'Jeux1' || req == 'Jeux2' || req == 'Jeux3' || req == 'Jeux4' || req == 'Jeux5' || req == 'Jeux6'){
+            currentGame = converterStoI(req);
+            Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => lsGames[currentGame]),
+                        );
+          }
+        },
+      );
+    }
+  }
+
+  void _sendMessage(String m) {
+    _flutterP2pConnectionPlugin.sendStringToSocket(m);
+  }
+
+  void showAlertDialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+void peekGame(){
+  Random random = Random();
+
+  int randomNumber = 0 + random.nextInt(lsGames.length);
+
+  print(randomNumber);
+
+  currentGame = randomNumber;
+}
+
+String theWinner(){
+  var j1 = 0;
+  var j2 = 0;
+  for(var i in winner){
+    if(i == 'Joueur1'){
+      j1++;
+    }
+    else{j2++;}
+  }
+  if(j1>j2){
+    return 'Joueur1';
+  }
+  else{
+    return 'Joueur2';
+  }
+}
+void supprGame(){
+  lsGames.remove(lsGames[currentGame]);
+}
+
+void finDeManche(int s){
+  if(_isHost){
+    myScore = s;
+    gestion();
+  }
+  else{
+    _flutterP2pConnectionPlugin.sendStringToSocket(s as String);
+  }
+}
+
+void gestion(){
+  if(winner.length < 3){
+    peekGame();
+    _sendMessage(converterItoS(currentGame));
+    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => lsGames[currentGame]),
+                        );
+  }
+  else{
+    vainqueur = theWinner();
+    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Resultat()),
+                        );
+  }
+  
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 71, 71),
-      body: SafeArea(
-        child: ListView(
+      appBar: AppBar(
+        title: Text('Connexion P2P'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.only(top: 10, right: 20),
-              alignment: Alignment.topRight,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const StartPage()));
-                },
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromARGB(255, 255, 136, 136)),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ))),
-                child: const Icon(Icons.close, color: Colors.white),
-              ),
+            ElevatedButton(
+              onPressed: _connect,
+              child: Text('Se connecter'),
             ),
-            const SizedBox(height: 200),
-            _pseudo == null
-                ? Column(
-                    children: [
-                      Container(
-                        width: 300,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(10),
-                            color: const Color.fromARGB(255, 255, 136, 136)),
-                        child: Column(children: [
-                          const Padding(
-                            padding: EdgeInsets.only(top: 20, bottom: 20),
-                            child: Text('ENTREZ UN PSEUDO',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ),
-                          TextField(
-                            controller: _controller,
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Color.fromARGB(255, 255, 71, 71),
-                              labelText: "Pseudo",
-                              labelStyle: TextStyle(color: Colors.white),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      width: 1,
-                                      color: Color.fromARGB(255, 255, 71, 71))),
-                              constraints: BoxConstraints(maxWidth: 220),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ]),
-                      ),
-                      const SizedBox(height: 30),
-                      Container(
-                          width: 300,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(10),
-                              color: const Color.fromARGB(255, 255, 95, 20)),
-                          child: TextButton(
-                            onPressed: () {
-                              if (_controller.text.isEmpty) {
-                                return;
-                              } else {
-                                _setPseudo();
-                                _connect();
-                              }
-                            },
-                            child: const Text('VALIDER',
-                                style: TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                          ))
-                    ],
-                  )
-                : _isConnected
-                    ? //Container()
-                    Column(
-                        children: [
-                          Container(
-                            width: 300,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                                color: const Color.fromARGB(255, 255, 136, 136)),
-                            child: Column(children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 20, bottom: 20),
-                                child: Text('Joueurs connectés : ',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              SizedBox(height: 20),
-                            ]),
-                          ),
-                          const SizedBox(height: 30),
-                          Container(
-                              width: 300,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: const Color.fromARGB(255, 255, 95, 20)),
-                              child: TextButton(
-                                onPressed: () {},
-                                child: const Text('JOUER',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              )),
-                        ],
-                      )
-                    : Column(
-                        children: [
-                          Container(
-                            width: 300,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(10),
-                                color: const Color.fromARGB(255, 255, 136, 136)),
-                            child: Column(children: [
-                              Padding(
-                                padding: EdgeInsets.only(top: 20, bottom: 20),
-                                child: Text('En attente des autres joueurs...',
-                                    style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              SizedBox(height: 10),
-                              CircularProgressIndicator(),
-                              SizedBox(height: 20),
-                            ]),
-                          ),
-                        ],
-                      ),
+            SizedBox(height: 20),
+            Text(
+              _isConnected ? 'Connecté' : 'Non connecté',
+              style: TextStyle(fontSize: 20),
+            ),
+            ElevatedButton(
+              onPressed:() {
+                _isHost = true;
+                print(_isHost);
+                _startSocket;
+                print(_isHost);
+              },
+              child: Text('Start Socket'),
+            ),
+            ElevatedButton(
+              onPressed: _connectToSocket,
+              child: Text('Connect to Socket'),
+            ),
+            ElevatedButton(
+              onPressed: gestion,
+              child: Text('Start Game'),
+            )
           ],
         ),
       ),
     );
   }
+}
+
+String converterItoS(int i){
+  if(i == 0)return 'Jeux1';
+  else if(i == 1)return 'Jeux2';
+  else if(i == 2)return 'Jeux3';
+  else if(i == 3)return 'Jeux4';
+  else if(i == 4)return 'Jeux5';
+  else return 'Jeux6';
+}
+
+int converterStoI(String s){
+  if(s == 'Jeux1')return 0;
+  else if(s == 'Jeux2')return 1;
+  else if(s == 'Jeux3')return 2;
+  else if(s == 'Jeux4')return 3;
+  else if(s == 'Jeux5')return 4;
+  else return 5;
 }
